@@ -7,4 +7,4 @@ if [ "$(uname -s)" = "Darwin" ]; then
 fi
 MAVEN_OPTS=${MAVEN_OPTS:--Xmx256m}
 export MAVEN_OPTS
-exec mvn -B -ntp clean test allure:report -DargLine=-Xmx384m "$@"
+exec mvn -B -ntp clean test allure:report "$@"

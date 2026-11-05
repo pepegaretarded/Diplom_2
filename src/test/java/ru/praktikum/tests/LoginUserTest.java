@@ -1,5 +1,6 @@
 package ru.praktikum.tests;
 
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import ru.praktikum.support.ApiTestBase;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
 public class LoginUserTest extends ApiTestBase {
@@ -19,7 +21,7 @@ public class LoginUserTest extends ApiTestBase {
     @Test
     @DisplayName("Вход существующего пользователя")
     public void registeredUserCanLogin() {
-        api.login(user.credentials()).then().statusCode(200)
+        api.login(user.credentials()).then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("user.email", equalTo(user.email()))
                 .body("user.name", equalTo(user.name()))
@@ -50,8 +52,9 @@ public class LoginUserTest extends ApiTestBase {
                 "password", "wrong-" + UUID.randomUUID()));
     }
 
+    @Step("Проверить отказ входа с неверными данными")
     private void assertInvalidCredentials(Map<String, String> credentials) {
-        api.login(credentials).then().statusCode(401)
+        api.login(credentials).then().statusCode(SC_UNAUTHORIZED)
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }

@@ -1,18 +1,20 @@
 package ru.praktikum.tests;
 
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import ru.praktikum.support.ApiTestBase;
 
 import java.util.Map;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
 public class CreateUserTest extends ApiTestBase {
     @Test
     @DisplayName("Регистрация уникального пользователя")
     public void uniqueUserCanRegister() {
-        user.register(user.data()).then().statusCode(200)
+        user.register(user.data()).then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("user.email", equalTo(user.email()))
                 .body("user.name", equalTo(user.name()))
@@ -24,7 +26,7 @@ public class CreateUserTest extends ApiTestBase {
     @DisplayName("Повторная регистрация отклоняется")
     public void duplicateUserCannotRegister() {
         user.create();
-        user.register(user.data()).then().statusCode(403)
+        user.register(user.data()).then().statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("User already exists"));
     }
@@ -47,10 +49,11 @@ public class CreateUserTest extends ApiTestBase {
         assertMissingField("name");
     }
 
+    @Step("Проверить отказ регистрации без обязательного поля {field}")
     private void assertMissingField(String field) {
         Map<String, String> payload = user.data();
         payload.remove(field);
-        user.register(payload).then().statusCode(403)
+        user.register(payload).then().statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }

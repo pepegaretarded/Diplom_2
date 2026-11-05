@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
 @RunWith(Parameterized.class)
@@ -36,11 +37,11 @@ public class CreateOrderTest extends ApiTestBase {
     @Test
     @DisplayName("Заказ с актуальными ингредиентами")
     public void orderWithIngredientsCanBeCreated() {
-        List<String> ingredients = api.ingredients().then().statusCode(200)
+        List<String> ingredients = api.ingredients().then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("data.size()", greaterThan(1))
                 .extract().jsonPath().getList("data._id", String.class);
-        api.createOrder(ingredients.subList(0, 2), token()).then().statusCode(200)
+        api.createOrder(ingredients.subList(0, 2), token()).then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("name", not(emptyOrNullString()))
                 .body("order.number", greaterThan(0));
@@ -49,7 +50,7 @@ public class CreateOrderTest extends ApiTestBase {
     @Test
     @DisplayName("Заказ без ингредиентов отклоняется")
     public void orderRequiresIngredients() {
-        api.createOrder(Collections.emptyList(), token()).then().statusCode(400)
+        api.createOrder(Collections.emptyList(), token()).then().statusCode(SC_BAD_REQUEST)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
     }
@@ -57,7 +58,7 @@ public class CreateOrderTest extends ApiTestBase {
     @Test
     @DisplayName("Заказ с неверным хешем ингредиента возвращает ошибку")
     public void orderRejectsInvalidIngredientHash() {
-        api.createOrder(List.of("invalid-ingredient-hash"), token()).then().statusCode(500)
+        api.createOrder(List.of("invalid-ingredient-hash"), token()).then().statusCode(SC_INTERNAL_SERVER_ERROR)
                 .body(containsString("Internal Server Error"));
     }
 }
