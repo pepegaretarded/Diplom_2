@@ -5,3 +5,4 @@ target/
 allure-results/
 allure-report/
 .env
+.allure/
