@@ -24,7 +24,8 @@ mvn clean test allure:report
 ./run-tests.sh
 ```
 
-Скрипт выбирает установленную Java 11, если `JAVA_HOME` не задан,
+На macOS скрипт выбирает установленную Java 11 для Apple Silicon,
+а при её отсутствии — доступную Java 11,
 запускает проверки и формирует Allure-отчёт. На этом Mac Java 11
 для Apple Silicon зарегистрирована и выбирается автоматически.
 
